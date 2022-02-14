@@ -113,12 +113,27 @@ function addQuantity (array) {
     if (cartItem.id === selectedItem.id) {
       cartItem.quantity = cartItem.quantity + 1
       stateItem.quantity = cartItem.quantity
+
+      addQuantityUi()
+      // const itemQuantity = document.querySelector(".quantity-text.center").innerHTML = cartItem.quantity
+      // console.log(itemQuantity)
+
       return 
     } 
   }
   renderItemInCart()
   array.push(stateItem)
 }
+
+function addQuantityUi () {
+  const myElement = document.getElementById("cart--item-list")
+  for(let i=0; i<myElement.children.length; i++) {
+    console.log(myElement.children[i])
+  }
+}
+
+
+
 
 
 function renderItemInCart () {
@@ -127,7 +142,9 @@ const img = document.createElement("img")
 img.classList = "cart--item-icon"
 img.setAttribute("src", `assets/icons/${selectedItem.id}.svg`)
 img.setAttribute("alt", selectedItem.name)
+const P = document.createElement("P")
 const name = document.createTextNode(selectedItem.name)
+P.append(name)
 const button = document.createElement("button")
 button.classList = "quantity-btn remove-btn center"
 const buttonText = document.createTextNode("-")
@@ -141,8 +158,11 @@ button2.classList = "quantity-btn add-btn center"
 const button2Text = document.createTextNode("+")
 button2.append(button2Text)
 
-li.append(img, name, button, span, button2)
+li.append(img, P, button, span, button2)
 carItem.append(li)
 }
 
 }
+
+
+//Update the quantity within the UI
