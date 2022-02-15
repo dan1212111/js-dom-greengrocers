@@ -61,9 +61,8 @@ const ulStoreList = document.getElementById("ulShopList")
 console.log(ulStoreList)
 
 // creating store inventory
-const renderShopItem = (shopList) => {
+const createShopItem = (shopList) => {
   for (let i = 0; i < shopList.length; i++) {
-    console.log(shopList[i])
     const li = document.createElement("li")
     const div = document.createElement("div")
     div.classList = ".store--item-icon"
@@ -80,89 +79,137 @@ const renderShopItem = (shopList) => {
 
     // adding event listener add item to basket
     button.addEventListener("click", () => {
-      renderCartItem(shopList[i])
+      addCartItemToState(shopList[i])
     })
   }
 }
 
-renderShopItem(state.items)
+createShopItem(state.items)
+
+/************** Your Cart Section  ******************/
 
 // getting id for renderCartItem
-const carItem = document.getElementById("cart--item-list")
-console.log(carItem)
+const cartItem = document.getElementById("cart--item-list")
 const carListItems = document.getElementById("cart--item-list-container")
 
-// rendering an item selected in the cart (UI)
-const renderCartItem = (selectedItem) => {
-    
+// Top-level render function - clears UI and then re-renders the page based on state
+function render() {
+  clear()
+  renderItemsList()
+}
+
+function clear() {
+  cartItem.innerHTML = ""
+}
+
+function renderItemsList() {
+  for (const item of state.cart) {
+    renderCart(item)
+  }
+}
+
+const addCartItemToState = (selectedItem) => {
   const quantity = 1
 
-  // adding item too state
   const stateItem = {
-      id: selectedItem.id,
-      name: selectedItem.name,
-      price: selectedItem.price,
-      quantity: quantity,
-    }
+    id: selectedItem.id,
+    name: selectedItem.name,
+    price: selectedItem.price,
+    quantity: quantity,
+  }
 
-    addQuantity(state.cart)
+  addQuantity(stateItem)
+  addSumTotal()
+  render()
+  console.log(state.cart)
 
-      //Updation quantity function (state)
-function addQuantity (array) {
-  for (const cartItem of array) {
+  return
+}
+
+function addQuantity(selectedItem) {
+  for (const cartItem of state.cart) {
     if (cartItem.id === selectedItem.id) {
       cartItem.quantity = cartItem.quantity + 1
-      stateItem.quantity = cartItem.quantity
-
-      addQuantityUi()
-      // const itemQuantity = document.querySelector(".quantity-text.center").innerHTML = cartItem.quantity
-      // console.log(itemQuantity)
-
-      return 
-    } 
+      addSumTotal()
+      render()
+      return
+    }
   }
-  renderItemInCart()
-  array.push(stateItem)
+  state.cart.push(selectedItem)
+  render()
 }
 
-function addQuantityUi () {
-  const myElement = document.getElementById("cart--item-list")
-  for(let i=0; i<myElement.children.length; i++) {
-    console.log(myElement.children[i])
+function decreaseQuantity(selectedItem) {
+  for (const cartItem of state.cart) {
+    if (cartItem.id === selectedItem.id) {
+      if (cartItem.quantity < 2) {
+        remove(selectedItem)
+      }
+      cartItem.quantity = cartItem.quantity - 1
+      addSumTotal()
+      render()
+      return
+    }
   }
+  state.cart.push(selectedItem)
+  render()
 }
 
-
-
-
-
-function renderItemInCart () {
-const li = document.createElement("li")
-const img = document.createElement("img")
-img.classList = "cart--item-icon"
-img.setAttribute("src", `assets/icons/${selectedItem.id}.svg`)
-img.setAttribute("alt", selectedItem.name)
-const P = document.createElement("P")
-const name = document.createTextNode(selectedItem.name)
-P.append(name)
-const button = document.createElement("button")
-button.classList = "quantity-btn remove-btn center"
-const buttonText = document.createTextNode("-")
-button.append(buttonText)
-const span = document.createElement("span")
-span.classList = "quantity-text center"
-const spanText = document.createTextNode(stateItem.quantity)
-span.append(spanText)
-const button2 = document.createElement("button")
-button2.classList = "quantity-btn add-btn center"
-const button2Text = document.createTextNode("+")
-button2.append(button2Text)
-
-li.append(img, P, button, span, button2)
-carItem.append(li)
+function remove(selectedItem) {
+  for (let i = 0; i < state.cart.length; i++) {
+    if (state.cart[i] === selectedItem) {
+      state.cart.splice(i, 1)
+    }
+  }
+  render()
 }
 
+function renderCart(selectedItem) {
+  const li = document.createElement("li")
+  const img = document.createElement("img")
+  img.classList = "cart--item-icon"
+  img.setAttribute("src", `assets/icons/${selectedItem.id}.svg`)
+  img.setAttribute("alt", selectedItem.name)
+  const P = document.createElement("P")
+  const name = document.createTextNode(selectedItem.name)
+  P.append(name)
+  const button = document.createElement("button")
+  button.classList = "quantity-btn remove-btn center"
+  const buttonText = document.createTextNode("-")
+  button.append(buttonText)
+  const span = document.createElement("span")
+  span.classList = "quantity-text center"
+  const spanText = document.createTextNode(selectedItem.quantity)
+  span.append(spanText)
+  const button2 = document.createElement("button")
+  button2.classList = "quantity-btn add-btn center"
+  const button2Text = document.createTextNode("+")
+  button2.append(button2Text)
+
+  button.addEventListener("click", () => {
+    decreaseQuantity(selectedItem)
+  })
+  button2.addEventListener("click", () => {
+    addQuantity(selectedItem)
+  })
+
+  li.append(img, P, button, span, button2)
+  cartItem.append(li)
 }
 
+function addSumTotal() {
+  let totalPrice = 0
+  let itemQuantity = 0
+  for (const itemSum of state.cart) {
+    itemQuantity = itemSum.quantity + itemQuantity
+    totalPrice = itemSum.price * itemQuantity + totalPrice
+  }
+  renderSumTotal(totalPrice.toFixed(2))
+}
 
-//Update the quantity within the UI
+function renderSumTotal(totalPrice) {
+  const totalSum = document.querySelector("#Total-number-sum")
+  totalSum.innerHTML = ""
+  const spanText = document.createTextNode(`£${totalPrice}`)
+  totalSum.append(spanText)
+}
