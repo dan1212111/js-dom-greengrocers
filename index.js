@@ -4,51 +4,61 @@ const state = {
       id: "001-beetroot",
       name: "beetroot",
       price: 0.35,
+      type: "veg",
     },
     {
       id: "002-carrot",
       name: "carrot",
       price: 0.35,
+      type: "veg",
     },
     {
       id: "003-apple",
       name: "apple",
       price: 0.35,
+      type: "fruit",
     },
     {
       id: "004-apricot",
       name: "apricot",
       price: 0.35,
+      type: "fruit",
     },
     {
       id: "005-avocado",
       name: "avocado",
       price: 0.35,
+      type: "veg",
     },
     {
       id: "006-bananas",
       name: "bananas",
       price: 0.35,
+      type: "fruit",
     },
     {
       id: "007-bell-pepper",
       name: "bell pepper",
       price: 0.35,
+      type: "veg",
     },
     {
       id: "008-berry",
       name: "berry",
       price: 0.35,
+      type: "fruit",
     },
     {
       id: "009-blueberry",
       name: "blueberry",
       price: 0.35,
+      type: "fruit",
     },
     {
       id: "010-eggplant",
       name: "eggplant",
       price: 0.35,
+      type: "veg",
     },
   ],
   cart: [],
@@ -62,6 +72,11 @@ console.log(ulStoreList)
 
 // creating store inventory
 const createShopItem = (shopList) => {
+  console.log(shopList)
+  renderShopItems(shopList)
+}
+
+function renderShopItems(shopList) {
   for (let i = 0; i < shopList.length; i++) {
     const li = document.createElement("li")
     const div = document.createElement("div")
@@ -73,14 +88,61 @@ const createShopItem = (shopList) => {
     const button = document.createElement("button")
     const buttonText = document.createTextNode("Add to cart")
     button.append(buttonText)
+    const div2 = document.createElement("div")
+    div2.classList = ".filterFruit"
+    const buttonFilterFruit = document.createElement("button")
+    const buttonFilterFruitText = document.createTextNode("FRUIT")
+    buttonFilterFruit.append(buttonFilterFruitText)
+    div2.append(buttonFilterFruit)
+    const div3 = document.createElement("div")
+    div3.classList = ".filterVeg"
+    div3.append(buttonFilterFruit)
+    const buttonFilterVeg = document.createElement("button")
+    const buttonFilterVegText = document.createTextNode("Veg")
+    buttonFilterVeg.append(buttonFilterVegText)
+    div3.append(buttonFilterVeg)
+    const div4 = document.createElement("div")
+    div4.classList = ".filterBoth"
+    div4.append(buttonFilterFruit)
+    const buttonFilterBoth = document.createElement("button")
+    const buttonFilterBothText = document.createTextNode("Both")
+    buttonFilterBoth.append(buttonFilterBothText)
+    div4.append(buttonFilterBoth)
 
-    li.append(div, button)
+    li.append(div, button, div2, div3, div4)
     ulStoreList.append(li)
 
     // adding event listener add item to basket
     button.addEventListener("click", () => {
       addCartItemToState(shopList[i])
     })
+
+    buttonFilterFruit.addEventListener("click", () => {
+      filterFruit(state.items)
+    })
+    buttonFilterVeg.addEventListener("click", () => {
+      filterVeg(state.items)
+    })
+    buttonFilterBoth.addEventListener("click", () => {
+      filterBoth(state.items)
+    })
+
+    function filterFruit(fruit) {
+      ulStoreList.innerHTML = ""
+      let fruitType = fruit.filter((item) => item.type === "fruit")
+      console.log(fruitType)
+      renderShopItems(fruitType)
+    }
+    function filterVeg(veg) {
+      ulStoreList.innerHTML = ""
+      let vegType = veg.filter((item) => item.type === "veg")
+      console.log(vegType)
+      renderShopItems(vegType)
+    }
+    function filterBoth(both) {
+      ulStoreList.innerHTML = ""
+      renderShopItems(both)
+    }
   }
 }
 
